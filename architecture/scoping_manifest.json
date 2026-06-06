@@ -1,0 +1,11 @@
+{
+  "project_title": "HCAI Multimodal Sensor Stream Pipeline (WESAD)",
+  "academic_supervisor": "Professor Solomon Sunday Oyelere",
+  "cloud_platform": "Amazon Web Services (AWS)",
+  "orchestration_engine": "Apache Airflow",
+  "governance_pillars": {
+    "privacy": "Anonymisation of high-frequency physical subject metrics",
+    "safety": "Programmatic sensor signal normalisation against custom human baselines",
+    "provenance": "Append-only Amazon S3 data landing event logging"
+  }
+}
