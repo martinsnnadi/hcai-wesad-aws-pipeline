@@ -36,9 +36,14 @@ To resolve these hardware constraints, I refactored the pipeline into a continuo
 * **The Chunk-Size Normalizer:** Intercepts unzipped streams (such as the 900 MB serialized `S10.pkl` arrays) and repackages them into exact byte blocks expected by the AWS SDK via a custom `FixedSizeStreamReader` wrapper class.
 * **Direct S3 Injection:** Pipes the data immediately out of the local memory workspace and uploads it directly into our private **`hcai-wesad-bronze-landing`** Amazon S3 bucket tier.
 
----
-
 ## 3. Storage Architecture & Governance Manifest
 * **Storage Framework:** Data lands in an append-only, fully private Amazon S3 bucket tier (`hcai-wesad-bronze-landing`). 
 * **Access Control Guardrails:** Public internet access is completely blocked [1]. Access is heavily restricted to authorized automated pipeline accounts to ensure total security for raw biometric signatures [1].
 * **Provenance Tracking:** Ingestion runs automatically generate explicit cloud metadata trails tracking `pipeline_execution_id`, `file_byte_size`, and `ingestion_timestamp`.
+
+----
+
+  ## 4. References
+ Schmidt, P., et al. (2018). 'Introducing WESAD, a Multimodal Dataset for Wearable Stress Detection in the Wild', *Proceedings of the 20th ACM International Conference on Multimodal Interaction*, pp. 400-408.  
+ Oyelere, S. S., et al. (2024). 'A Scoping Review of Hybrid Intelligence Systems for Human-Centred AI in Education', *Computers in Human Behavior*, 150, p. 107995.  
+ Shneiderman, B. (2021). 'Human-Centered Artificial Intelligence: Reliable, Safe & Trustworthy', *International Journal of Human–Computer Interaction*, 37(6), pp. 479-491.
