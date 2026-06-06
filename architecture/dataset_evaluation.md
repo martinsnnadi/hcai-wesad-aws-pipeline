@@ -1,1 +1,76 @@
-1. Access and LicenceThe BaselineThe Wearable Stress Detection (WESAD) dataset is a public, multimodal biometric dataset compiled by Schmidt et al. (2018). It is hosted securely by the UCI Machine Learning Repository [1].Licensing FrameThe dataset is openly available for academic research, education, and development purposes. It requires formal attribution to the authors' primary scientific publication.Governance MappingWESAD is ideal for your public GitHub portfolio. It contains no text-based Personally Identifiable Information (PII) like names or national ID numbers. However, because it captures raw, high-frequency human physiological telemetry, it contains Biometric Signature Markers. Under Human-Centered AI governance frameworks [2], raw biometric data must be treated as sensitive data. Your AWS pipeline must enforce an identity isolation boundary to ensure that subject numbers (S2 through S17) cannot be cross-referenced with external data layers [3].2. Technical RichnessSchema StructureWESAD is composed of raw, binary compression layers containing multi-sensor data from 15 human subjects. For each subject, the files contain synchronized telemetry from two distinct physical devices:RespiBan (Chest Device): Samples data at 700 Hz (700 readings per second). Tracks Electrocardiogram (ECG), Electrodermal Activity (EDA), Electromyogram (EMG), Respiration, and 3-axis Accelerometer.Empatica E4 (Wrist Device): Samples data at multi-frequency rates. Tracks Blood Volume Pulse (BVP at 64Hz), EDA (4Hz), Ambient Skin Temperature (4Hz), and Accelerometer (32Hz).Scale and DiversityThe dataset is roughly 500 MB compressed, but it expands to over 2 GB of raw binary data. Because the sampling rates vary from 4 Hz to 700 Hz, it presents a massive asynchronous data integration challenge.Engineering OpportunitiesWorking with WESAD on AWS requires:Configuring secure storage layers using Amazon S3 Buckets.Writing Python streaming chunks to extract heavy, serialized binary files (.pkl / Pickle files) without blowing up the memory of your computing nodes.Building signal-alignment functions to match high-frequency chest sensors with low-frequency wrist sensors.Orchestrating workflows using Apache Airflow DAGs.3. Research Relevance & HCAI PillarsHuman‑Centred CoreWESAD aligns directly with Professor Oyelere’s work on hybrid intelligence and human wellbeing [2]. Instead of evaluating virtual digital clicks, this dataset tracks physical human responses to stress, cognitive loads, and emotional states.Ethical AI & Human SafetyThe Model Drift Blocker: Standard automated AI models frequently trigger false alarms because every human body has a completely different baseline heart rate or sweat conductivity level (EDA). A model trained on Subject 2 will misclassify Subject 5.The HCAI Solution: Your data engineering pipeline must implement Individualised Baseline Standardisation. By calculating the specific mean and standard deviation of each subject's amusement/rest state, you normalize the signals before they reach an AI. This guarantees human safety and prevents algorithmic model drift.4. Data Quality ChallengesSerialized Binary Formats: The core data is stored inside .pkl (Pickle) files containing nested dictionaries of NumPy arrays. These cannot be read by standard SQL database systems; they must be parsed by a Python-based computing cluster.Extreme High-Volume Noise: Raw ECG and EMG signals contain massive electronic artifacts (noise from movement). Your pipeline must prepare the infrastructure to handle signal smoothing.Asynchronous Time Alignments: A wrist reading happens 4 times a second, while a chest reading happens 700 times a second. Your pipeline must downsample or upsample these streams into uniform chronological bins.
+# WESAD Dataset Evaluation & Strategic Scoping
+**Framework Category:** Data Governance & Portfolio Feasibility  
+**Project Context:** Data Engineering for Human‑Centred AI Research  
+**Academic Supervisor:** Professor Solomon Sunday Oyelere  
+
+## 1. Access and Licence
+### The Baseline
+The Wearable Stress Detection (WESAD) dataset is a public, multimodal biometric dataset compiled by [Schmidt et al. (2018)](https://dl.acm.org/doi/10.1145/3242969.3242985). It is hosted securely by the [UCI Machine Learning Repository](https://archive.ics.uci.edu/ml/datasets/WESAD+%28Wearable+Stress+and+Affect+Detection%29).
+
+### Licensing Frame
+The dataset is openly available for academic research, education, and development purposes. It requires formal attribution to the authors' primary scientific publication via the [ACM Digital Library](https://dl.acm.org/doi/10.1145/3242969.3242985).
+
+### Governance Mapping
+This open-access framework is ideal for public GitHub portfolios, allowing developers to showcase sophisticated biomedical pipelines. 
+
+While the dataset contains no text-based Personally Identifiable Information (PII) like names or national ID numbers, it contains distinct Biometric Signature Markers. Because it captures raw, high-frequency human physiological telemetry, Human-Centered AI governance frameworks dictate that this raw biometric data must be treated as sensitive data. Your cloud data pipeline must enforce an identity isolation boundary to ensure that subject identifiers (S2 through S17) cannot be cross-referenced with external data layers.
+
+---
+
+## 2. Technical Richness
+### Schema Structure
+WESAD is composed of raw, binary compression layers containing multi-sensor data from 15 human subjects. For each subject, the files contain synchronized telemetry from two distinct physical devices:
+* **RespiBan (Chest Device)**: Samples data at a continuous 700 Hz (700 readings per second). It tracks Electrocardiogram (ECG), Electrodermal Activity (EDA), Electromyogram (EMG), Respiration, and 3-axis Accelerometer data.
+* **Empatica E4 (Wrist Device)**: Samples data at multi-frequency rates. It tracks Blood Volume Pulse (BVP at 64Hz), EDA (4Hz), Ambient Skin Temperature (4Hz), and Accelerometer (32Hz).
+
+### Scale and Diversity
+The dataset is roughly 500 MB compressed, but it expands to over 2 GB of raw binary data. Because the sampling rates vary wildly from 4 Hz to 700 Hz, it presents a massive asynchronous data integration challenge.
+
+### Engineering Opportunities
+Working with WESAD requires building enterprise-grade data infrastructure:
+* Configuring secure storage layers using Amazon S3 Buckets.
+* Writing Python streaming chunks to extract heavy, serialized binary files (`.pkl` / Pickle files) without blowing up the memory of your computing nodes.
+* Building custom signal-alignment functions to match high-frequency chest sensors with low-frequency wrist sensors.
+* Orchestrating the ingestion and extraction workflows using Apache Airflow DAGs.
+
+---
+
+## 3. Research Relevance & HCAI Pillars
+### Human‑Centred Core
+The dataset aligns directly with Professor Oyelere’s core research into hybrid intelligence, collaborative AI design, and human wellbeing. Instead of evaluating digital footprints or virtual clicks, this dataset tracks physical, subconscious human responses to stress, cognitive loads, and emotional states.
+
+### Ethical AI & Human Safety
+* **The Model Drift Blocker**: Standard automated AI models frequently trigger false alarms because every human body has a completely different baseline heart rate, skin temperature, or sweat conductivity level (EDA). An AI model trained on Subject 2 will misclassify Subject 5. 
+* **The HCAI Solution**: Your data engineering pipeline must implement **Individualised Baseline Standardisation**. By calculating the specific mean and standard deviation of each subject's amusement/rest state, you normalize the signals before they reach an AI. This guarantees human safety, ensures personalization, and prevents algorithmic model drift.
+
+---
+
+## 4. Data Quality Challenges
+Real-world physiological data is highly volatile, offering several authentic engineering hurdles:
+* **Serialized Binary Formats**: The core data is stored inside `.pkl` (Pickle) files containing deeply nested dictionaries of NumPy arrays. These cannot be read by standard SQL database systems; they must be parsed by a Python-based computing cluster.
+* **Extreme High-Volume Noise**: Raw ECG and EMG signals contain massive electronic artifacts and noise generated by physical body movement. Your pipeline must prepare the infrastructure to handle signal smoothing, filtering, and rolling window averages.
+* **Asynchronous Time Alignments**: A wrist reading happens 4 times a second, while a chest reading happens 700 times a second. Your pipeline must downsample or upsample these streams into uniform chronological bins without losing critical medical indicators.
+
+---
+
+## 5. Portfolio Value
+This project moves far beyond generic data science templates to demonstrate elite, highly employable data-engineering capability. 
+
+### Enterprise Architecture
+You will implement a production-grade AWS Cloud Pipeline utilizing Amazon S3, AWS Glue, and Python containerized clusters to transform raw binary blobs into clean, queryable analytics stores.
+
+### Advanced Data Patterns
+You will demonstrate capability in:
+* Parsing non-relational, serialized raw hardware streams.
+* Engineering real-time signal processing math at scale.
+* Aligning highly disparate time-series data frequencies.
+
+### The HCAI Premium
+Modern data organizations desperately need engineers who understand data ethics, privacy engineering, compliance, and physical safety. Building an identity-isolated pipeline that balances raw biometric telemetry with individualized normalization checks will instantly set your portfolio apart from standard data applicants.
+
+---
+
+## 📚 References
+* **[1]** Schmidt, P., Reiss, A., Duerichen, R., Marberger, C. and Van Laerhoven, K. (2018) 'Introducing WESAD: A Multimodal Dataset for Wearable Stress and Affect Detection', *Proceedings of the 20th ACM International Conference on Multimodal Interaction (ICMI '18)*, pp. 400-408. Available at: [ACM Digital Library](https://dl.acm.org/doi/10.1145/3242969.3242985).
+* **[2]** Oyelere, S. S., et al. (2026) 'A Scoping Review of Hybrid Intelligence Systems for Human-Centred AI in Education', *Computers in Human Behavior*, 150, p. 107995. Available at: [ScienceDirect](https://www.sciencedirect.com/science/article/pii/S2949882126000241).
+* **[3]** Shneiderman, B. (2021) 'Human-Centered Artificial Intelligence: Reliable, Safe & Trustworthy', *International Journal of Human–Computer Interaction*, 37(6), pp. 479-491.
