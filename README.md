@@ -43,7 +43,26 @@ To resolve these hardware constraints, the pipeline was refactored into a contin
 
 The event-driven streaming bridge preserves full multi-modal data lineage by capturing both the serialized participant dictionaries and the primitive sensor signals organized into subject-specific partitions:
 
-📁 hcai-wesad-bronze-landing/📁 WESAD/📄 wesad_readme.pdf — Global dataset documentation manifest📁 S10/ — Subject Partition (Repeated S2-S17)📦 S10.pkl — Serialized Subject Dictionary🤐 S10_E4_Data.zip — Raw untouched E4 Wrist Telemetry📝 S10_respiban.txt — Raw 700 Hz Chest Sensor Stream📊 S10_quest.csv — Human Ground-Truth Affect Surveys
+<ul>
+  <li>📁 <strong>hcai-wesad-bronze-landing/</strong>
+    <ul>
+      <li>📁 <strong>WESAD/</strong>
+        <ul>
+          <li>📄 <code>wesad_readme.pdf</code> — <em>Global dataset documentation manifest</em></li>
+          <li>📁 <strong>S10/</strong> — <em>Subject Partition (Repeated S2-S17)</em>
+            <ul>
+              <li>📦 <code>S10.pkl</code> — <em>Serialized Subject Dictionary</em></li>
+              <li>🤐 <code>S10_E4_Data.zip</code> — <em>Raw untouched E4 Wrist Telemetry</em></li>
+              <li>📝 <code>S10_respiban.txt</code> — <em>Raw 700 Hz Chest Sensor Stream</em></li>
+              <li>📊 <code>S10_quest.csv</code> — <em>Human Ground-Truth Affect Surveys</em></li>
+            </ul>
+          </li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+</ul>
+
 
 
 ## 🛡️ 4. Storage Architecture & Governance Manifest
