@@ -42,6 +42,7 @@ To resolve these hardware constraints, the pipeline was refactored into a contin
 ## 📂 3. Directory Layout & File Manifest
 
 The event-driven streaming bridge preserves full multi-modal data lineage by capturing both the serialized participant dictionaries and the primitive sensor signals organized into subject-specific partitions:
+
 hcai-wesad-bronze-landing/
 └── WESAD/
     ├── wesad_readme.pdf          # Global dataset documentation manifest
