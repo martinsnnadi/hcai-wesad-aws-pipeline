@@ -49,7 +49,7 @@ def stream_sensor_package_to_s3():
     Streams and de-serializes the archive directly to AWS staging boundaries without disk overhead.
     """
     print("[1/2] Initiating streaming connection to high-frequency sensor cache...")
-    # This is the exact verified working URL from your execution
+   
     SOURCE_URL = "https://uni-siegen.sciebo.de/public.php/dav/files/HGdUkoNlW1Ub0Gx"
     S3_BUCKET_NAME = "hcai-wesad-bronze-landing"
     
