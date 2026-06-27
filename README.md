@@ -1,47 +1,46 @@
-# 🛰️ Multimodal Biometric Ingestion Infrastructure (WESAD)
-### HCAI Data Pipeline Track | Version 1.1 (Amazon AWS)
+# WESAD Ingestion Infrastructure
+### HCAI Parallel Cloud Pipeline Track | Amazon AWS Tier
 
-**Academic Supervisor:** Professor Solomon Sunday Oyelere  
-**Project Horizon:** 24-Week Parallel Processing Research Roadmap  
-**Current Milestone:** Week 8 (Bronze Layer Validation & Inventory Enforcement)
+**Supervisor:** Prof. Solomon Sunday Oyelere  
+**Milestone:** Week 8 (Bronze Validation & Inventory Enforcement)
 
 ---
 
 ## 1. Project & Dataset Review
 
-This track focuses on building a secure, high-integrity data infrastructure for the Wearable Stress Detection (WESAD) dataset under the academic supervision of Professor Solomon Sunday Oyelere.
+Secure, high-integrity data infrastructure for the Wearable Stress Detection (WESAD) dataset.
 
 ### 1.1 Technical Profile
-*   **Domain:** Digital Health / Wearable Computing & Wellbeing.
-*   **Source Engine:** Multimodal biometric sensor streams from 15 human participants.
-*   **Telemetry Data Scale:** High-frequency raw data capturing continuous physiological signals: RespiBan Chest Device (ECG, EDA, EMG, Respiration sampled at 700 Hz) and Empatica E4 Wristband (BVP at 64Hz, EDA at 4Hz, Temp at 4Hz, ACC at 32Hz).
-*   **Verified Storage Footprint:** Uncompressed binary telemetry expands to **16,763.98 MB (16.37 GB)** safely distributed across **76 verified object blobs** within our cloud staging tier.
+*   **Domain**: Digital Health / Wearable Computing & Wellbeing.
+*   **Source Stream**: Multimodal biometric sensor telemetry from 15 human participants.
+*   **Data Scale**: High-frequency signals across RespiBan Chest Device (ECG, EDA, EMG, Respiration @ 700 Hz) and Empatica E4 Wristband (BVP @ 64Hz, EDA @ 4Hz, Temp @ 4Hz, ACC @ 32Hz).
+*   **Storage Footprint**: Uncompressed binary telemetry expands to **16,763.98 MB (16.37 GB)** across **76 verified object blobs** in cloud storage.
 
-### 1.2 Human-Centred AI (HCAI) Risk Assessment
-*   **Model Drift Safety:** Standard AI stress-prediction models suffer from critical accuracy failures due to natural, baseline physiological differences between individual human bodies. A model trained on raw variables of one subject will instantly misclassify another.
-*   **The HCAI Guardrail:** This pipeline sets up the environment to enforce Individualised Baseline Standardisation. By computing the specific statistical mean and standard deviation of each subject's rest state, it normalizes sensor drifts before data passes to machine learning layers.
-*   **Biometric Identity Isolation:** To prevent individual tracking fingerprinting, the raw hardware streams are completely decoupled from downstream consumption using strict AWS Identity and Access Management (IAM) bucket boundaries.
-
----
-
-## 2. Ingestion Breakthrough: Zero-Disk, Low-Memory Streaming Double-Bridge
-
-During the active ingestion execution phase, downloading and unpacking the binary telemetry package triggered severe resource bottlenecks on standard cloud compute nodes:
-*   **Disk Bottleneck (Errno 28):** The container ran out of local scratch space while attempting to unzip the files onto the native drive.
-*   **Memory Bottleneck (Killed):** Bypassing the disk and loading the complete uncompressed archive into system RAM instantly triggered the Linux Out-of-Memory (OOM) Killer.
-
-### ⚙️ The Multi-Part Streaming Architecture
-To resolve these hardware constraints, the pipeline was refactored into a continuous, event-driven stream processing architecture across four synchronized layers:
-1.  **The 64 KB Intake Valve:** Maintains a microscopic, fixed network memory buffer, pulling binary byte fragments from the repository server to keep the overall RAM footprint near zero.
-2.  **On-The-Fly De-serialization:** Dynamically parses zip archive headers sequentially, unzipping the sensor data fragments directly in mid-air as they pass through the network card interface.
-3.  **The Chunk-Size Normalizer:** Intercepts unzipped streams (such as the 900 MB serialized S10.pkl arrays) and repackages them into exact byte blocks expected by the AWS SDK via a custom `FixedSizeStreamReader` wrapper class.
-4.  **Direct S3 Injection:** Pipes the data immediately out of the local memory workspace and uploads it directly into our private `hcai-wesad-bronze-landing` Amazon S3 bucket tier.
+### 1.2 HCAI Risk Assessment
+*   **Model Drift**: Stress-prediction models fail due to individual baseline physiological differences. Pipeline sets up directory structures to calculate **Individualised Baseline Standardisation** (rest-state mean/standard deviation) to neutralize sensor drift.
+*   **Identity Isolation**: Disables public access and uses strict AWS IAM bucket boundaries to decouple raw biometric hardware streams from downstream model layers.
 
 ---
 
-## 📂 3. Directory Layout & File Manifest
+## 2. Ingestion Breakthrough: Zero-Disk Streaming Double-Bridge
 
-The event-driven streaming bridge preserves full multi-modal data lineage by capturing both the serialized participant dictionaries and the primitive sensor signals organized into subject-specific partitions:
+Unpacking the raw telemetry package on standard compute nodes triggered major resource bottlenecks:
+*   **Disk Bottleneck (`Errno 28`)**: Container ran out of scratch space trying to unzip files onto the local drive.
+*   **Memory Bottleneck (`Killed`)**: Bypassing the disk to unpack the full archive directly into RAM triggered the Linux Out-of-Memory (OOM) Killer.
+
+### The Multi-Part Streaming Architecture
+Refactored pipeline into a continuous, event-driven stream processing layout across four layers:
+1.  **64 KB Intake Valve**: Pulls binary byte fragments from the repository server using a fixed memory buffer to keep the local RAM footprint near zero.
+2.  **In-Air De-serialization**: Parses zip archive headers sequentially, unzipping data fragments inside the network card interface.
+3.  **Chunk-Size Normalizer**: Intercepts unzipped streams (like the 900 MB `S10.pkl` arrays) and repackages them into exact byte blocks using a custom `FixedSizeStreamReader` class.
+4.  **Direct S3 Injection**: Pipes the data immediately out of memory and uploads it straight into our private `hcai-wesad-bronze-landing` S3 bucket.
+
+---
+
+## 3. Directory Layout & File Manifest
+
+The streaming bridge preserves full multi-modal lineage by separating the zipped signals, raw text streams, and survey metrics into subject-specific partitions:
+
 
 <ul>
   <li>📁 <strong>hcai-wesad-bronze-landing/</strong>
@@ -63,27 +62,27 @@ The event-driven streaming bridge preserves full multi-modal data lineage by cap
   </li>
 </ul>
 
+---
 
+## 4. Storage Architecture & Governance Manifest
 
-## 🛡️ 4. Storage Architecture & Governance Manifest
+### 4.1 Access Control & VS Code Gateway
+*   **Network Privacy**: Blocks public web access. Limits visibility to authorized automated pipeline accounts to protect biometric data.
+*   **Local Developer Gateway**: Connects locally in VS Code using the **AWS Credentials Provider Chain (`~/.aws/`)**. Signs outbound traffic via **AWS Signature Version 4 (SigV4)**, allowing internal catalog queries without exposing secrets or pushing keys to GitHub.
 
-### 4.1 Access Control Guardrails & Local Connection Local Client
-*   **Network Privacy:** Public internet access is completely blocked. Access is heavily restricted to authorized automated pipeline accounts to ensure total security for raw biometric signatures.
-*   **Local Developer Gateway (VS Code):** Local scripting connects natively using the local **AWS Credentials Provider Chain (`~/.aws/`)**. Outbound requests are signed locally via **AWS Signature Version 4 (SigV4)**, allowing internal catalog queries without exposing secrets to the open web or pushing keys to GitHub repositories.
-
-### 4.2 Automated S3 Lifecycle Retention Policy (Storage Liability Control)
-To enforce strict compliance boundaries matching DAMA-DMBOK data governance pillars, the `hcai-wesad-bronze-landing` container utilizes an automated bucket lifecycle rule:
-*   **Glacier Transition:** Moves high-volume raw text streams to cold storage after **180 days** to minimize continuous active cloud storage overhead.
-*   **Permanent Expiration:** Automatically purges records completely after **365 days** to comply with standard HIPAA and GDPR biological data liabilities.
+### 4.2 S3 Lifecycle Retention Policy (DAMA-DMBOK Alignment)
+Applies a programmatic bucket lifecycle rule to mitigate active data liabilities:
+*   **Glacier Transition**: Moves high-volume raw text streams to cold storage after **180 days** to cut active cloud storage overhead.
+*   **Permanent Expiration**: Purges files completely after **365 days** to comply with standard HIPAA and GDPR biological data guidelines.
 
 ### 4.3 Provenance Tracking & Week 8 Validation
-Ingestion runs automatically generate explicit cloud metadata trails tracking `pipeline_execution_id`, `file_byte_size`, and `ingestion_timestamp`. 
+Generates automated metadata logs tracking `pipeline_execution_id`, `file_byte_size`, and `ingestion_timestamp`.
 
-Our automated Week 8 python audit script (`validate_s3_inventory.py`) verifies our multi-modal deployment state and validates our total asset breakdown:
+Our automated Week 8 python audit script (`validate_s3_inventory.py`) checks storage integrity and verifies the object matrix state:
 ```python
 import boto3
 s3_client = boto3.client('s3')
-# Audits multi-modal extensions (.pkl, .zip, .csv, .txt), verifies byte scales, and maps folder structures.
+# Audits object extensions (.pkl, .zip, .csv, .txt), checks byte scales, and maps folder paths.
 response = s3_client.list_objects_v2(Bucket='hcai-wesad-bronze-landing')
 ```
 
@@ -91,6 +90,6 @@ response = s3_client.list_objects_v2(Bucket='hcai-wesad-bronze-landing')
 
 ## 5. References
 
-1.  Schmidt, P., et al. (2018). 'Introducing WESAD, a Multimodal Dataset for Wearable Stress Detection in the Wild', *Proceedings of the 20th ACM International Conference on Multimodal Interaction*, pp. 400-408.
-2.  Oyelere, S. S., et al. (2024). 'A Scoping Review of Hybrid Intelligence Systems for Human-Centred AI in Education', *Computers in Human Behavior*, 150, p. 107995.
-3.  Shneiderman, B. (2021). 'Human-Centered Artificial Intelligence: Reliable, Sa
+1. Schmidt, P. et al. (2018) 'Introducing WESAD, a Multimodal Dataset for Wearable Stress Detection in the Wild', *Proceedings of the 20th ACM ICMI*, pp. 400-408.
+2. Oyelere, S. S. et al. (2024) 'A Scoping Review of Hybrid Intelligence Systems for Human-Centred AI in Education', *Computers in Human Behavior*, 150.
+3. Shneiderman, B. (2021) 'Human-Centered Artificial Intelligence: Reliable, Safe
